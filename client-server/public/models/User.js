@@ -72,11 +72,9 @@ class User {
                     this[name] = new Date(json[name]);
                     break;
                 default:
-                    this[name] = json[name];
+                  if(name.substring(0, 1) == '_') this[name] = json[name];
             }
         }
-
-
     }
 
     static getUsersStorage() {
@@ -94,59 +92,78 @@ class User {
 
     getNewId() {
 
-       let userId =  localStorage.getItem("userId")
+        let userId = localStorage.getItem("userId")
 
         if (!userId > 0) userId = 0;
 
         userId++;
 
-        localStorage.setItem("userId" , userId);
+        localStorage.setItem("userId", userId);
 
         return userId;
 
     }
 
-    save() {
+    toJSON() {
 
-        let users = User.getUsersStorage();
+        let json = {};
 
-        if (this.id > 0) {
+        Object.keys(this).forEach(key => {
 
-            users.map(u => {
+            if (this[key] !== undefined) json[key] = this[key];
 
-                if (u._id == this.id) {
+        });
 
-                    Object.assign(u , this);
-                }
-                return u;
-            });
-        }
-
-        else {
-
-            this._id = this.getNewId();
-            users.push(this);
-
-        }
-
-         localStorage.setItem("users", JSON.stringify(users));
+        return json;
 
     }
 
-    remove(){
+    save() {
+
+        return new Promise((resolve, reject) => {
+
+            let promise;
+
+            if (this.id) {
+
+                promise = HttpRequest.put(`/users/${this.id}`, this.toJSON());
+
+            }
+            else {
+
+                promise = HttpRequest.post('/users', this.toJSON());
+
+            }
+
+            promise.then(data => {
+
+                this.loadFromJSON(data);
+                resolve(this);
+
+            }).catch(e => {
+
+                reject(e);
+
+            });
+
+        });
+
+    }
+
+    remove() {
 
         let users = User.getUsersStorage();
 
-        users.forEach((userData, index) =>{
+        users.forEach((userData, index) => {
 
-            if(this._id == userData._id){
+            if (this._id == userData._id) {
 
-           users.splice(index , 1)
+                users.splice(index, 1)
 
             }
 
         });
-    
+
         localStorage.setItem("users", JSON.stringify(users));
 
     }
