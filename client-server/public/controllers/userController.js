@@ -151,7 +151,7 @@ class UserController {
 
             else {
 
-                resolve('/home/gustavonascimento/Downloads/user.png');
+                resolve('dist/img/user.png');
             }
         });
 
