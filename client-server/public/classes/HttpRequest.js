@@ -59,8 +59,6 @@ class HttpRequest {
             ajax.send(JSON.stringify(params));
 
         });
-
-
     }
 
 }
