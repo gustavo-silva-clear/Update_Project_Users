@@ -108,6 +108,8 @@ class UserController {
 
                     this.formEl.reset();
 
+                    console.log("userController");
+
                     btn.disabled = false;
 
                 });
@@ -162,6 +164,7 @@ class UserController {
             else {
 
                 resolve('dist/img/user.png');
+               
             }
         });
 
